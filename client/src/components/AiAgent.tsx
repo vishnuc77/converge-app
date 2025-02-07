@@ -56,7 +56,6 @@ const AiAgent: React.FC<AiAgentProps> = ({ userId, onTransferSuccess, balance })
             });
             setShowTransferModal(true);
           } else if (tx.name === 'Swap') {
-            console.log('Setting up swap with onTransferSuccess:', onTransferSuccess);
             const args = JSON.parse(tx.arguments);
             setSwapDetails({
               fromSymbol: args.fromSymbol.toUpperCase(),

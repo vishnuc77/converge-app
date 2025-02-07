@@ -13,6 +13,6 @@ export type SwapArgs = {
 export interface TransactionResponse {
   transactions?: {
     name: 'Transfer' | 'Swap';
-    arguments: TransferArgs | SwapArgs;
+    arguments: string;
   }[];
 } 

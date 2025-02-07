@@ -16,31 +16,30 @@ const EmailForm: React.FC<EmailFormProps> = ({
   return (
     <>
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-          Email Address
-        </label>
         <input
           type="email"
           id="email"
           value={email}
           onChange={(e) => onEmailChange(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full max-w-xl mx-auto px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           placeholder="Enter your email"
           disabled={loading}
         />
       </div>
       
-      <button
-        onClick={onSubmit}
-        disabled={loading}
-        className={`w-full py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
-          loading 
-            ? 'bg-blue-400 cursor-not-allowed' 
-            : 'bg-blue-600 hover:bg-blue-700'
-        } text-white`}
-      >
-        {loading ? 'Sending...' : 'Register'}
-      </button>
+      <div className="mt-4">
+        <button
+          onClick={onSubmit}
+          disabled={loading}
+          className={`bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900 transition-colors ${
+            loading 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-gray-800 hover:bg-gray-900'
+          } text-white`}
+        >
+          {loading ? 'Sending...' : 'Register'}
+        </button>
+      </div>
     </>
   );
 };

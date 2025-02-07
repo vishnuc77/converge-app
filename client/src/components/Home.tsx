@@ -150,6 +150,17 @@ const Home = () => {
     setError(null);
   };
 
+  const handleLogout = async () => {
+    try {
+      await account.deleteSession('current');
+      setIsAuthenticated(false);
+      setUserId(null);
+      setWalletInfo(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   if (isPageLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -163,7 +174,7 @@ const Home = () => {
       <Navbar 
         email={walletInfo?.email}
         address={walletInfo?.address}
-        onLogout={isAuthenticated ? () => setIsAuthenticated(false) : undefined}
+        onLogout={isAuthenticated ? handleLogout : undefined}
       />
       
       <div className="flex flex-col items-center">

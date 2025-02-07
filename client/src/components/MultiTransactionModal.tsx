@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SwapForm from './SwapForm';
 import TransferForm from './TransferForm';
 import { executeSwap } from '../services/swapService';
@@ -8,7 +8,7 @@ import { SwapArgs, TransferArgs } from '../types/transactions';
 
 interface Transaction {
   name: 'Swap' | 'Transfer';
-  arguments: SwapArgs | TransferArgs;
+  arguments: string;
 }
 
 interface MultiTransactionModalProps {
@@ -30,37 +30,52 @@ const MultiTransactionModal: React.FC<MultiTransactionModalProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [swapValues, setSwapValues] = useState<any>(null);
   const [transferValues, setTransferValues] = useState<any>(null);
+  const [dependentValues, setDependentValues] = useState<Record<number, string>>({});
 
   const handleConfirmAll = async () => {
     setIsProcessing(true);
     setError(null);
 
     try {
-      for (const tx of transactions) {
-        if (tx.name === 'Swap') {
-          const txId = await executeSwap(
-            userId,
-            swapValues.fromToken as keyof typeof assets,
-            swapValues.toToken as keyof typeof assets,
-            parseFloat(swapValues.fromAmount)
-          );
-          onSuccess(txId);
-        } else if (tx.name === 'Transfer') {
-          const txId = await transferTokens(
-            userId,
-            transferValues.to,
-            parseFloat(transferValues.amount),
-            transferValues.assetSymbol as keyof typeof assets
-          );
-          onSuccess(txId);
-        }
-      }
+      const txId1 = await executeSwap(
+        userId,
+        swapValues.fromToken.toUpperCase() as keyof typeof assets,
+        swapValues.toToken.toUpperCase() as keyof typeof assets,
+        parseFloat(swapValues.fromAmount)
+      );
+      
+      // Add 10 second delay
+      await new Promise(resolve => setTimeout(resolve, 10000));
+      
+      const txId2 = await transferTokens(
+        userId,
+        transferValues.to,
+        parseFloat(transferValues.amount),
+        transferValues.assetSymbol.toUpperCase() as keyof typeof assets
+      );
+      onSuccess(txId2);
+        
       onClose();
     } catch (err) {
       console.error('Transaction error:', err);
       setError('Failed to process transactions. Please try again.');
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  // Add logging to track values
+  const handleSwapChange = (index: number, values: any) => {
+    setSwapValues(values);
+    
+    if (values.toAmount) {
+      setDependentValues(prev => {
+        const newValues = {
+          ...prev,
+          [index + 1]: values.toAmount
+        };
+        return newValues;
+      });
     }
   };
 
@@ -72,37 +87,49 @@ const MultiTransactionModal: React.FC<MultiTransactionModalProps> = ({
           {error && <div className="text-red-500 mb-2">{error}</div>}
 
           {transactions.map((tx, index) => {
-            const args = JSON.parse(tx.arguments);
-            return (
-              <div key={index} className="mb-6">
-                <h3 className="font-medium mb-3">{tx.name}</h3>
-                {tx.name === 'Swap' && (
+            if (tx.name === 'Swap') {
+              const args: SwapArgs = JSON.parse(tx.arguments)
+
+              return (
+                <div key={index} className="mb-6">
+                  <h3 className="font-medium mb-3">{tx.name}</h3>
                   <SwapForm
                     userId={userId}
                     balance={balance}
                     initialValues={{
-                      fromSymbol: args.fromSymbol,
-                      toSymbol: args.toSymbol,
+                      fromSymbol: args.fromSymbol.toUpperCase(),
+                      toSymbol: args.toSymbol.toUpperCase(),
                       amount: args.amount.toString(),
                     }}
                     onError={setError}
-                    onChange={setSwapValues}
+                    onChange={(values) => handleSwapChange(index, values)}
                   />
-                )}
-                {tx.name === 'Transfer' && (
+                  {index < transactions.length - 1 && <hr className="my-4" />}
+                </div>
+              );
+            } else if (tx.name === 'Transfer') {
+              const args: TransferArgs = JSON.parse(tx.arguments)
+              const swapOutputAmount = dependentValues[index];
+
+              return (
+                <div key={index} className="mb-6">
+                  <h3 className="font-medium mb-3">{tx.name}</h3>
                   <TransferForm
+                    key={`transfer-${swapOutputAmount}`}
                     balance={balance}
                     initialValues={{
+                      ...args,
                       to: args.destination,
-                      amount: args.amount.toString(),
-                      assetSymbol: args.symbol,
+                      amount: swapOutputAmount || args.amount.toString(),
+                      assetSymbol: args.symbol.toUpperCase(),
                     }}
                     onChange={setTransferValues}
                   />
-                )}
-                {index < transactions.length - 1 && <hr className="my-4" />}
-              </div>
-            );
+                  {index < transactions.length - 1 && <hr className="my-4" />}
+                </div>
+              );
+            }
+            return null;
           })}
 
           <div className="flex justify-end gap-2">

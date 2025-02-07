@@ -15,7 +15,6 @@ interface TransferModalProps {
 }
 
 const TransferModal: React.FC<TransferModalProps> = ({ userId, onClose, onTransferSuccess, balance, initialValues }) => {
-  console.log('TransferModal props:', { onTransferSuccess });
   const [to, setTo] = useState(initialValues?.to || '');
   const [assetSymbol, setAssetSymbol] = useState(initialValues?.assetSymbol || 'ETH');
   const [amount, setAmount] = useState(initialValues?.amount || '');

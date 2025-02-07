@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { debounce } from 'lodash';
 import { fetchSwapQuotes } from '../services/swapService';
 import assets from '../starknetAssetsMetadata/assets';
@@ -33,6 +33,12 @@ const SwapForm: React.FC<SwapFormProps> = ({
   const [toToken, setToToken] = useState(initialValues?.toSymbol || 'STRK');
   const [isLoadingQuote, setIsLoadingQuote] = useState(false);
 
+  useEffect(() => {
+    if (initialValues?.amount) {
+      fetchQuote(initialValues.amount);
+    }
+  }, []);
+
   const fetchQuote = useCallback(
     debounce(async (newAmount: string) => {
       if (!newAmount || isNaN(Number(newAmount)) || Number(newAmount) <= 0) {
@@ -48,9 +54,9 @@ const SwapForm: React.FC<SwapFormProps> = ({
           toToken as keyof typeof assets,
           Number(newAmount)
         );
-        setToAmount(buyAmount.toString() || '');
-        console.log('fromAmount', fromAmount);
-        onChange({ fromAmount: newAmount, fromToken, toAmount: buyAmount.toString(), toToken });
+        const truncatedBuyAmount = (Math.floor(Number(buyAmount) * 1_000_000) / 1_000_000).toString();
+        setToAmount(truncatedBuyAmount || '');
+        onChange({ fromAmount: newAmount, fromToken, toAmount: truncatedBuyAmount, toToken });
       } catch (err) {
         console.error('Failed to fetch quote:', err);
         onError('Failed to fetch swap quote');
@@ -66,7 +72,6 @@ const SwapForm: React.FC<SwapFormProps> = ({
     const newAmount = e.target.value;
     setFromAmount(newAmount);
     fetchQuote(newAmount);
-    console.log('fromAmount', fromAmount);
     onChange({ fromAmount: newAmount, fromToken, toAmount, toToken });
   };
 
@@ -104,7 +109,11 @@ const SwapForm: React.FC<SwapFormProps> = ({
             />
           </div>
         </div>
-        <p className="text-sm text-gray-500 mt-1">Balance: {balance}</p>
+        <div className="mb-4">
+          <div className="flex gap-4">
+            <p className="text-sm text-gray-500 mt-1">Balance: {balance}</p>
+          </div>
+        </div>
       </div>
 
       <div className="mb-6">

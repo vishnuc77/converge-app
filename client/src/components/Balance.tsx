@@ -11,6 +11,7 @@ interface BalanceProps {
 
 const Balance: React.FC<BalanceProps> = ({ userId, assetSymbol = 'ETH', setBalance }) => { 
   const [balance, setBalanceState] = useState<string>('0');
+  const [balanceStrk, setBalanceStrk] = useState<string>('0');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,6 +27,14 @@ const Balance: React.FC<BalanceProps> = ({ userId, assetSymbol = 'ETH', setBalan
         const formattedBalance = parseFloat(currentBalance.toString()).toFixed(5);
         setBalance(formattedBalance);
         setBalanceState(formattedBalance);
+
+        const tokenAddressStrk = assets['STRK'].tokenAddress;
+        const responseStrk = await axios.get(
+          `${API_URL}/wallets/balance/?tokenAddress=${tokenAddressStrk}&userId=${userId}`
+        );
+        const currentBalanceStrk = responseStrk.data.balance/Math.pow(10, assets['STRK'].decimals);
+        const formattedBalanceStrk = parseFloat(currentBalanceStrk.toString()).toFixed(5);
+        setBalanceStrk(formattedBalanceStrk);
       } catch (err) {
         setError('Failed to fetch balance');
         console.error('Error fetching balance:', err);
@@ -56,8 +65,13 @@ const Balance: React.FC<BalanceProps> = ({ userId, assetSymbol = 'ETH', setBalan
   return (
     <div className="flex flex-col items-center p-4">
       <h3 className="text-gray-500 text-sm mb-1">Balance</h3>
-      <p className="text-2xl font-semibold text-gray-900 flex items-center">
-        {balance} {assetSymbol}
+      <p className="text-gray-900 flex items-center">
+        <span className="font-semibold">{assetSymbol}</span>
+        <span className="ml-1">{balance}</span>
+      </p>
+      <p className="text-gray-900 flex items-center">
+        <span className="font-semibold">STRK</span>
+        <span className="ml-1">{balanceStrk}</span>
       </p>
     </div>
   );
