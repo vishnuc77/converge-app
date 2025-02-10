@@ -15,7 +15,7 @@ interface MultiTransactionModalProps {
   userId: string;
   transactions: Transaction[];
   onClose: () => void;
-  onSuccess: (txId: string) => void;
+  onSuccess: (txId: string[]) => void;
   balance: string;
 }
 
@@ -45,7 +45,7 @@ const MultiTransactionModal: React.FC<MultiTransactionModalProps> = ({
       );
       
       // Add 10 second delay
-      await new Promise(resolve => setTimeout(resolve, 10000));
+      await new Promise(resolve => setTimeout(resolve, 5000));
       
       const txId2 = await transferTokens(
         userId,
@@ -53,7 +53,9 @@ const MultiTransactionModal: React.FC<MultiTransactionModalProps> = ({
         parseFloat(transferValues.amount),
         transferValues.assetSymbol.toUpperCase() as keyof typeof assets
       );
-      onSuccess(txId2);
+
+      // Pass both transaction IDs to onSuccess
+      onSuccess([txId1, txId2]);
         
       onClose();
     } catch (err) {

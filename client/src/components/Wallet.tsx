@@ -23,7 +23,7 @@ interface WalletProps {
 const Wallet: React.FC<WalletProps> = ({ email, address, userId, setIsAuthenticated, setUserId, setWalletInfo }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
-  const [txLink, setTxLink] = useState<string | null>(null);
+  const [txLinks, setTxLinks] = useState<string[]>([]);
   const [balanceUpdated, setBalanceUpdated] = useState(false);
   const [balance, setBalance] = useState<string>('0');
 
@@ -41,21 +41,23 @@ const Wallet: React.FC<WalletProps> = ({ email, address, userId, setIsAuthentica
   const closeSwapModal = () => setIsSwapModalOpen(false);
 
   useEffect(() => {
-    if (txLink) {
-      const timer = setTimeout(() => setTxLink(null), 10000);
+    if (txLinks.length > 0) {
+      const timer = setTimeout(() => setTxLinks([]), 10000);
       return () => clearTimeout(timer);
     }
-  }, [txLink]);
+  }, [txLinks]);
 
-  const handleTransferSuccess = (txId: string) => {
-    const link = `https://sepolia.starkscan.co/tx/${txId}`;
-    setTxLink(link);
+  const handleTransferSuccess = (txId: string | string[]) => {
+    const links = Array.isArray(txId) 
+      ? txId.map(id => `https://sepolia.starkscan.co/tx/${id}`)
+      : [`https://sepolia.starkscan.co/tx/${txId}`];
+    setTxLinks(links);
     triggerBalanceUpdate();
   };
 
   const handleSwapSuccess = (txId: string) => {
     const link = `https://sepolia.starkscan.co/tx/${txId}`;
-    setTxLink(link);
+    setTxLinks([link]);
     triggerBalanceUpdate();
   };
 
@@ -95,16 +97,19 @@ const Wallet: React.FC<WalletProps> = ({ email, address, userId, setIsAuthentica
         <div className="mt-8">
           <AiAgent userId={userId} onTransferSuccess={handleTransferSuccess} balance={balance} />
         </div>
-        {txLink && (
-          <div className="mt-4 flex justify-center">
-            <a
-              href={txLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-green-500 hover:underline flex items-center gap-1"
-            >
-              View in Explorer
-            </a>
+        {txLinks.length > 0 && (
+          <div className="mt-4 flex flex-col items-center gap-2">
+            {txLinks.map((link, index) => (
+              <a
+                key={index}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-500 hover:underline flex items-center gap-1"
+              >
+                View Transaction {txLinks.length > 1 ? index + 1 : ''} in Explorer
+              </a>
+            ))}
           </div>
         )}
       </div>
