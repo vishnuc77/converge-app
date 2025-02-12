@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import TransactionModal from './TransactionModal';
 import TransferModal from './TransferModal';
 import SwapModal from './SwapModal';
 import { TransactionResponse } from '../types/transactions';
@@ -9,7 +8,7 @@ import MultiTransactionModal from './MultiTransactionModal';
 
 interface AiAgentProps {
   userId: string;
-  onTransferSuccess: (txId: string) => void;
+  onTransferSuccess: (txId: string | string[]) => void;
   balance: string;
 }
 
