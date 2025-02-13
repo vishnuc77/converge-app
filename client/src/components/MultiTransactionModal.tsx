@@ -17,6 +17,7 @@ interface MultiTransactionModalProps {
   onClose: () => void;
   onSuccess: (txId: string[]) => void;
   balance: string;
+  balanceStrk: string;
 }
 
 const MultiTransactionModal: React.FC<MultiTransactionModalProps> = ({
@@ -25,6 +26,7 @@ const MultiTransactionModal: React.FC<MultiTransactionModalProps> = ({
   onClose,
   onSuccess,
   balance,
+  balanceStrk
 }) => {
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -98,6 +100,7 @@ const MultiTransactionModal: React.FC<MultiTransactionModalProps> = ({
                   <SwapForm
                     userId={userId}
                     balance={balance}
+                    balanceStrk={balanceStrk}
                     initialValues={{
                       fromSymbol: args.fromSymbol.toUpperCase(),
                       toSymbol: args.toSymbol.toUpperCase(),

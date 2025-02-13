@@ -122,6 +122,7 @@ const AiAgent: React.FC<AiAgentProps> = ({ userId, onTransferSuccess, balance, b
           onClose={() => setTransaction(null)}
           onSuccess={onTransferSuccess}
           balance={balance}
+          balanceStrk={balanceStrk}
         />
       )}
       
@@ -131,6 +132,7 @@ const AiAgent: React.FC<AiAgentProps> = ({ userId, onTransferSuccess, balance, b
           onClose={() => setShowTransferModal(false)}
           onTransferSuccess={onTransferSuccess}
           balance={balance}
+          balanceStrk={balanceStrk}
           initialValues={transferDetails}
         />
       )}
@@ -141,6 +143,7 @@ const AiAgent: React.FC<AiAgentProps> = ({ userId, onTransferSuccess, balance, b
           onClose={() => setShowSwapModal(false)}
           onSwapSuccess={onTransferSuccess}
           balance={balance}
+          balanceStrk={balanceStrk}
           initialValues={swapDetails}
         />
       )}
