@@ -5,6 +5,7 @@ import SwapModal from './SwapModal';
 import Balance from './Balance';
 import AiAgent from './AiAgent';
 import circuitLogo from '../assets/circuit_logo.svg';
+import { AlertCircle, Coins, ArrowLeftRight } from 'lucide-react';
 
 interface WalletInfo {
   email: string;
@@ -115,6 +116,20 @@ const Wallet: React.FC<WalletProps> = ({ email, address, userId, setIsAuthentica
       </div>
       {isModalOpen && <TransferModal userId={userId} onClose={closeModal} onTransferSuccess={handleTransferSuccess} balance={balance} />}
       {isSwapModalOpen && <SwapModal userId={userId} onClose={closeSwapModal} onSwapSuccess={handleSwapSuccess} balance={balance} />}
+      <div className="space-y-4 mt-32">
+        <div className="border border-gray-400 bg-gray-100 p-2 rounded-lg text-sm">
+          <div className="text-gray-500 ml-3">
+            <div className="flex items-center gap-1 mt-1">
+              <Coins className="h-3 w-3" />
+              <span>Supported assets: ETH & STRK (More coming soon 🚀)</span>
+            </div>
+            <div className="flex items-center gap-1 mt-1">
+              <ArrowLeftRight className="h-3.5 w-3.5" />
+              <span>Available actions: Transfer & Swap (Expanding soon 🔥)</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

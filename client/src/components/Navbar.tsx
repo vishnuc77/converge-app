@@ -43,6 +43,11 @@ const Navbar: React.FC<NavbarProps> = ({ email, address, onLogout }) => {
               </button>
             </div>
             
+            <div className="flex items-center px-3 py-1 bg-gray-100 rounded-md cursor-default">
+              <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+              <span className="text-sm text-gray-600">Starknet Sepolia</span>
+            </div>
+            
             <button
               onClick={onLogout}
               className="bg-red-400 text-white px-4 py-2 rounded-md hover:bg-red-600"
