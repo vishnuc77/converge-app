@@ -12,9 +12,10 @@ interface TransferModalProps {
     amount: string;
     assetSymbol: string;
   };
+  balanceStrk: string;
 }
 
-const TransferModal: React.FC<TransferModalProps> = ({ userId, onClose, onTransferSuccess, balance, initialValues }) => {
+const TransferModal: React.FC<TransferModalProps> = ({ userId, onClose, onTransferSuccess, balance, balanceStrk, initialValues }) => {
   const [to, setTo] = useState(initialValues?.to || '');
   const [assetSymbol, setAssetSymbol] = useState(initialValues?.assetSymbol || 'ETH');
   const [amount, setAmount] = useState(initialValues?.amount || '');
@@ -52,12 +53,14 @@ const TransferModal: React.FC<TransferModalProps> = ({ userId, onClose, onTransf
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Asset Symbol</label>
-            <input
-              type="text"
+            <select
               value={assetSymbol}
               onChange={(e) => setAssetSymbol(e.target.value)}
               className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-            />
+            >
+              <option value="ETH">ETH</option>
+              <option value="STRK">STRK</option>
+            </select>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Amount</label>
@@ -67,7 +70,9 @@ const TransferModal: React.FC<TransferModalProps> = ({ userId, onClose, onTransf
               onChange={(e) => setAmount(e.target.value)}
               className="mt-1 block w-full border border-gray-300 rounded-md p-2"
             />
-            <p className="text-sm text-gray-500 mt-1">Balance: {balance}</p>
+            <p className="text-sm text-gray-500 mt-1">
+              Balance: {assetSymbol === 'ETH' ? balance : balanceStrk}
+            </p>
           </div>
           <div className="flex justify-end">
             <button

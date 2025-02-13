@@ -6,6 +6,7 @@ import assets from '../starknetAssetsMetadata/assets';
 interface SwapFormProps {
   userId: string;
   balance: string;
+  balanceStrk: string;
   initialValues?: {
     fromSymbol: string;
     toSymbol: string;
@@ -23,6 +24,7 @@ interface SwapFormProps {
 const SwapForm: React.FC<SwapFormProps> = ({
   userId,
   balance,
+  balanceStrk,
   initialValues,
   onError,
   onChange,
@@ -35,53 +37,65 @@ const SwapForm: React.FC<SwapFormProps> = ({
 
   useEffect(() => {
     if (initialValues?.amount) {
-      fetchQuote(initialValues.amount);
+      fetchQuote(initialValues.amount, initialValues.fromSymbol, initialValues.toSymbol);
     }
   }, []);
 
-  const fetchQuote = useCallback(
-    debounce(async (newAmount: string) => {
-      if (!newAmount || isNaN(Number(newAmount)) || Number(newAmount) <= 0) {
-        setToAmount('');
-        return;
-      }
+  const fetchQuoteImmediate = async (newAmount: string, currentFromToken: string, currentToToken: string) => {
+    if (!newAmount || isNaN(Number(newAmount)) || Number(newAmount) <= 0) {
+      setToAmount('');
+      return;
+    }
 
-      setIsLoadingQuote(true);
-      try {
-        const buyAmount = await fetchSwapQuotes(
-          userId,
-          fromToken as keyof typeof assets,
-          toToken as keyof typeof assets,
-          Number(newAmount)
-        );
-        const truncatedBuyAmount = (Math.floor(Number(buyAmount) * 1_000_000) / 1_000_000).toString();
-        setToAmount(truncatedBuyAmount || '');
-        onChange({ fromAmount: newAmount, fromToken, toAmount: truncatedBuyAmount, toToken });
-      } catch (err) {
-        console.error('Failed to fetch quote:', err);
-        onError('Failed to fetch swap quote');
-        setToAmount('');
-      } finally {
-        setIsLoadingQuote(false);
-      }
+    setIsLoadingQuote(true);
+    try {
+      const buyAmount = await fetchSwapQuotes(
+        userId,
+        currentFromToken as keyof typeof assets,
+        currentToToken as keyof typeof assets,
+        Number(newAmount)
+      );
+      const truncatedBuyAmount = (Math.floor(Number(buyAmount) * 1_000_000) / 1_000_000).toString();
+      setToAmount(truncatedBuyAmount || '');
+      onChange({ fromAmount: newAmount, fromToken: currentFromToken, toAmount: truncatedBuyAmount, toToken: currentToToken });
+    } catch (err) {
+      console.error('Failed to fetch quote:', err);
+      onError('Failed to fetch swap quote');
+      setToAmount('');
+    } finally {
+      setIsLoadingQuote(false);
+    }
+  };
+
+  const fetchQuote = useCallback(
+    debounce((newAmount: string, currentFromToken: string, currentToToken: string) => {
+      fetchQuoteImmediate(newAmount, currentFromToken, currentToToken);
     }, 1000),
-    [userId, fromToken, toToken, onChange]
+    [userId, onChange]
   );
 
   const handleFromAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAmount = e.target.value;
     setFromAmount(newAmount);
-    fetchQuote(newAmount);
+    fetchQuote(newAmount, fromToken, toToken);
     onChange({ fromAmount: newAmount, fromToken, toAmount, toToken });
   };
 
   const handleTokenChange = (type: 'from' | 'to', value: string) => {
     if (type === 'from') {
       setFromToken(value);
-      onChange({ fromAmount, fromToken: value, toAmount, toToken });
+      setToToken(value === 'ETH' ? 'STRK' : 'ETH');
+      onChange({ fromAmount, fromToken: value, toAmount, toToken: value === 'ETH' ? 'STRK' : 'ETH' });
+      if (fromAmount) {
+        fetchQuote(fromAmount, value, value === 'ETH' ? 'STRK' : 'ETH');
+      }
     } else {
       setToToken(value);
-      onChange({ fromAmount, fromToken, toAmount, toToken: value });
+      setFromToken(value === 'ETH' ? 'STRK' : 'ETH');
+      onChange({ fromAmount, fromToken: value === 'ETH' ? 'STRK' : 'ETH', toAmount, toToken: value });
+      if (fromAmount) {
+        fetchQuote(fromAmount, fromToken, value);
+      }
     }
   };
 
@@ -100,18 +114,19 @@ const SwapForm: React.FC<SwapFormProps> = ({
             />
           </div>
           <div className="flex-1">
-            <input
-              type="text"
+            <select
               value={fromToken}
               onChange={(e) => handleTokenChange('from', e.target.value)}
-              placeholder="Token"
               className="w-full border border-gray-300 rounded-md p-2"
-            />
+            >
+              <option value="ETH">ETH</option>
+              <option value="STRK">STRK</option>
+            </select>
           </div>
         </div>
         <div className="mb-4">
           <div className="flex gap-4">
-            <p className="text-sm text-gray-500 mt-1">Balance: {balance}</p>
+            <p className="text-sm text-gray-500 mt-1">Balance: {fromToken === 'ETH' ? balance : balanceStrk}</p>
           </div>
         </div>
       </div>
@@ -129,13 +144,14 @@ const SwapForm: React.FC<SwapFormProps> = ({
             />
           </div>
           <div className="flex-1">
-            <input
-              type="text"
+            <select
               value={toToken}
               onChange={(e) => handleTokenChange('to', e.target.value)}
-              placeholder="Token"
               className="w-full border border-gray-300 rounded-md p-2"
-            />
+            >
+              <option value="ETH">ETH</option>
+              <option value="STRK">STRK</option>
+            </select>
           </div>
         </div>
       </div>

@@ -27,6 +27,7 @@ const Wallet: React.FC<WalletProps> = ({ email, address, userId, setIsAuthentica
   const [txLinks, setTxLinks] = useState<string[]>([]);
   const [balanceUpdated, setBalanceUpdated] = useState(false);
   const [balance, setBalance] = useState<string>('0');
+  const [balanceStrk, setBalanceStrk] = useState<string>('0');
 
   const triggerBalanceUpdate = () => setBalanceUpdated(prev => !prev);
 
@@ -74,11 +75,16 @@ const Wallet: React.FC<WalletProps> = ({ email, address, userId, setIsAuthentica
   };
 
   return (
-    // <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden md:max-w-2xl p-8 border border-gray-200">
     <>
-      <div className="p-4 text-center space-y-8">
-        <div className="flex flex-col items-center mt-4">
-          <Balance userId={userId} assetSymbol="ETH" key={balanceUpdated.toString()} setBalance={setBalance} />
+      <div className="p-4 text-center space-y-8 w-full max-w-md mx-auto">
+        <div className="w-full">
+          <Balance 
+            userId={userId} 
+            assetSymbol="ETH" 
+            key={balanceUpdated.toString()} 
+            setBalance={setBalance}
+            setBalanceStrk={setBalanceStrk}
+          />
         </div>
         <div className="flex justify-center gap-8">
           <button
@@ -96,7 +102,7 @@ const Wallet: React.FC<WalletProps> = ({ email, address, userId, setIsAuthentica
           </button>
         </div>
         <div className="mt-8">
-          <AiAgent userId={userId} onTransferSuccess={handleTransferSuccess} balance={balance} />
+          <AiAgent userId={userId} onTransferSuccess={handleTransferSuccess} balance={balance} balanceStrk={balanceStrk} />
         </div>
         {txLinks.length > 0 && (
           <div className="mt-4 flex flex-col items-center gap-2">
@@ -114,9 +120,9 @@ const Wallet: React.FC<WalletProps> = ({ email, address, userId, setIsAuthentica
           </div>
         )}
       </div>
-      {isModalOpen && <TransferModal userId={userId} onClose={closeModal} onTransferSuccess={handleTransferSuccess} balance={balance} />}
-      {isSwapModalOpen && <SwapModal userId={userId} onClose={closeSwapModal} onSwapSuccess={handleSwapSuccess} balance={balance} />}
-      <div className="space-y-4 mt-32">
+      {isModalOpen && <TransferModal userId={userId} onClose={closeModal} onTransferSuccess={handleTransferSuccess} balance={balance} balanceStrk={balanceStrk} />}
+      {isSwapModalOpen && <SwapModal userId={userId} onClose={closeSwapModal} onSwapSuccess={handleSwapSuccess} balance={balance} balanceStrk={balanceStrk} />}
+      <div className="space-y-4 mt-16">
         <div className="border border-gray-400 bg-gray-100 p-2 rounded-lg text-sm">
           <div className="text-gray-500 ml-3">
             <div className="flex items-center gap-1 mt-1">

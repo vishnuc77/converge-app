@@ -169,10 +169,10 @@ export class WalletService {
     }
 
     const AVNU_OPTIONS = { baseUrl: 'https://sepolia.api.avnu.fi' };
-    const strkAddress = "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+
     const params = {
       sellTokenAddress: sellTokenAddress,
-      buyTokenAddress: strkAddress,
+      buyTokenAddress: buyTokenAddress,
       sellAmount: BigInt(sellAmount),
       takerAddress: wallet.address,
     }

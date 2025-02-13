@@ -13,9 +13,10 @@ interface SwapModalProps {
     toSymbol: string;
     amount: string;
   };
+  balanceStrk: string;
 }
 
-const SwapModal: React.FC<SwapModalProps> = ({ userId, onClose, onSwapSuccess, balance, initialValues }) => {
+const SwapModal: React.FC<SwapModalProps> = ({ userId, onClose, onSwapSuccess, balance, balanceStrk, initialValues }) => {
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [swapValues, setSwapValues] = useState<{
@@ -61,6 +62,7 @@ const SwapModal: React.FC<SwapModalProps> = ({ userId, onClose, onSwapSuccess, b
           <SwapForm
             userId={userId}
             balance={balance}
+            balanceStrk={balanceStrk}
             initialValues={initialValues}
             onError={setError}
             onChange={setSwapValues}

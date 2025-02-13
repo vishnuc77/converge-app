@@ -170,7 +170,7 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-200 to-gray-200 pt-24">
+    <div className="min-h-screen bg-gradient-to-b from-gray-200 to-gray-200 pt-8">
       <Navbar 
         email={walletInfo?.email}
         address={walletInfo?.address}

@@ -10,9 +10,10 @@ interface AiAgentProps {
   userId: string;
   onTransferSuccess: (txId: string | string[]) => void;
   balance: string;
+  balanceStrk: string;
 }
 
-const AiAgent: React.FC<AiAgentProps> = ({ userId, onTransferSuccess, balance }) => {
+const AiAgent: React.FC<AiAgentProps> = ({ userId, onTransferSuccess, balance, balanceStrk }) => {
   const [searchPrompt, setSearchPrompt] = useState('');
   const [transaction, setTransaction] = useState<TransactionResponse | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
