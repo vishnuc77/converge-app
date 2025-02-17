@@ -18,7 +18,7 @@ export class PromptService {
           type: 'function',
           function: {
             name: 'Transfer',
-            description: 'Transfer tokens to another address.',
+            description: 'Send or Transfer tokens to another address.',
             parameters: {
               type: 'object',
               properties: {
@@ -61,7 +61,7 @@ export class PromptService {
           },
         ],
         tools,
-        temperature: 0.7
+        temperature: 2
       };
 
     try {
@@ -71,12 +71,10 @@ export class PromptService {
               Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
             },
           });
-      
+
         if (!response.data?.choices?.[0]?.message?.tool_calls) {
             throw new Error('Invalid response structure from OpenAI API');
         }
-
-        console.log(response.data.choices.tool_calls);
         
         return response.data.choices[0].message.tool_calls.map((toolCall: any) => toolCall.function);
     } catch (error: any) {
